@@ -1,5 +1,21 @@
 import type { Metadata } from "next";
+import { Inter, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-headline",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-label",
+});
 
 export const metadata: Metadata = {
   title: "NEON_NOCTURNE | Digital Curator",
@@ -12,14 +28,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en" className={`${inter.variable} ${manrope.variable} ${spaceGrotesk.variable} dark scroll-smooth`}>
       <head>
         <link
-          href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;500&family=Space_Grotesk:wght@400;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         />
       </head>
-      <body className="selection:bg-primary-container selection:text-on-primary-container">
+      <body className="bg-background text-on-surface-variant selection:bg-primary-container selection:text-on-primary-container antialiased">
         {children}
       </body>
     </html>
