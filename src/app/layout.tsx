@@ -1,20 +1,26 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, Space_Grotesk } from "next/font/google";
+import { Inter, Manrope, Space_Grotesk, Crimson_Pro } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-body",
 });
 
 const manrope = Manrope({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-headline",
 });
 
 const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-label",
+});
+
+const crimsonPro = Crimson_Pro({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-serif",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -28,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${manrope.variable} ${spaceGrotesk.variable} dark scroll-smooth`}>
+    <html lang="vi" className={`${inter.variable} ${manrope.variable} ${spaceGrotesk.variable} ${crimsonPro.variable} dark scroll-smooth`}>
       <head>
         <link
           rel="stylesheet"

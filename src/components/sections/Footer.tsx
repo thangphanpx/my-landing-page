@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Link as LinkIcon, Globe, Mail, MessageCircle, ExternalLink } from "lucide-react";
+import { Link as LinkIcon, Globe, ExternalLink } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

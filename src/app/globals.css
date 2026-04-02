@@ -54,9 +54,20 @@
   --color-on-secondary-fixed-variant: #6e208c;
   --color-secondary-container: #6e208c;
 
-  --font-headline: "Manrope", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --font-label: "Space Grotesk", sans-serif;
+  --font-headline: var(--font-headline), system-ui, sans-serif;
+  --font-body: var(--font-body), system-ui, sans-serif;
+  --font-label: var(--font-label), system-ui, sans-serif;
+  --font-serif: var(--font-serif), Georgia, serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
 @layer utilities {
@@ -67,15 +78,4 @@
   .glow-indicator {
     box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
   }
-  .asymmetric-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 2rem;
-  }
-}
-
-body {
-  background-color: #131313;
-  color: #bbc9cf;
-  font-family: 'Inter', sans-serif;
 }

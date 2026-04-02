@@ -37,7 +37,7 @@ export default function Services() {
         >
           <div className="max-w-2xl">
             <h2 className="font-label text-secondary text-sm tracking-[0.4em] uppercase mb-4">Năng lực</h2>
-            <h3 className="font-headline text-5xl md:text-6xl text-on-surface font-bold tracking-tight">
+            <h3 className="font-headline text-5xl md:text-6xl text-on-surface font-bold tracking-tight leading-tight">
               Giải pháp cho <br /><span className="text-secondary drop-shadow-[0_0_15px_rgba(237,177,255,0.4)]">Tương lai</span>
             </h3>
           </div>

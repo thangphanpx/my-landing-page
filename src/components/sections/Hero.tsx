@@ -34,7 +34,7 @@ export default function Hero() {
             </span>
           </div>
           
-          <h1 className="font-headline font-extrabold text-7xl lg:text-[100px] text-on-surface leading-[0.95] tracking-tighter">
+          <h1 className="font-headline font-extrabold text-7xl lg:text-[100px] text-on-surface leading-[1.1] tracking-tighter">
             Kiến tạo <br />
             <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-container to-primary drop-shadow-[0_0_25px_rgba(0,210,255,0.4)]">
               Trải nghiệm
@@ -76,6 +76,7 @@ export default function Hero() {
                 alt="Avatar" 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDpmK-Xft1cG2PH1_bX1ZMEJ7BUnNN70pKj-5Po8uUylFLDbuiHU1JdDVvFczQDpks8lebCqKswdzqjAssXe8fDleYBlgHjJg-qnbAHqeEvI28Cf6rTDG2QT0a2lvSMgsjQ8oAztmxf3qqRlYKf4vAPlrPD8OyrqAT8yVB0kEvbV8JYX17OPCWfsjoqBoubmZE7djyps9sAbNv4KYC7TC_cRQybESitVw0sWCPuCZUOEiug4F-SQVjOQBQb5paxlOsS16W-lQQCO4"
                 fill
+                sizes="(max-width: 1024px) 320px, 500px"
                 className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
                 priority
               />
