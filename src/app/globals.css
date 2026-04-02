@@ -78,4 +78,34 @@
   .glow-indicator {
     box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
   }
+
+  /* Chatboard Markdown Rendering Styles */
+  .chat-markdown {
+    @apply text-sm leading-relaxed;
+  }
+  .chat-markdown p {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+  .chat-markdown p:last-child {
+    margin-bottom: 0;
+  }
+  .chat-markdown ul, .chat-markdown ol {
+    margin-bottom: 1rem;
+    padding-left: 1.25rem;
+    list-style-type: disc;
+  }
+  .chat-markdown li {
+    margin-bottom: 0.25rem;
+  }
+  .chat-markdown strong {
+    @apply font-bold text-primary-container;
+  }
+  .chat-markdown code {
+    @apply px-1.5 py-0.5 rounded-sm bg-surface-container-highest font-mono text-[0.85em];
+    font-family: 'Fira Code', 'Consolas', monospace;
+  }
+  .chat-markdown blockquote {
+    @apply border-l-4 border-white/20 pl-4 py-1 italic text-on-surface-variant/60 mb-3;
+  }
 }

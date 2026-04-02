@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bot, Send, User, X, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 
 interface Message {
   id: string;
@@ -17,7 +19,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Xin chào! Tôi là trợ lý AI của NEON_NOCTURNE. Tôi có thể giúp gì cho bạn?",
+      text: "Xin chào! Tôi là trợ lý AI của **NEON_NOCTURNE**. Tôi có thể giúp gì cho bạn?\n\n> Hãy thử hỏi về: **giá**, **dịch vụ** hoặc **làm dự án**.",
       sender: "bot",
       timestamp: new Date(),
     },
@@ -61,10 +63,10 @@ export default function Chatbot() {
 
   const getBotResponse = (input: string) => {
     const text = input.toLowerCase();
-    if (text.includes("giá") || text.includes("chi phí")) return "Giá các dự án phụ thuộc vào quy mô và yêu cầu cụ thể. Hãy để lại thông tin trong form liên hệ bên dưới để nhận báo giá chi tiết nhé!";
-    if (text.includes("dịch vụ") || text.includes("làm gì")) return "Chúng tôi cung cấp các dịch vụ: Kiến trúc hình ảnh, Định vị thương hiệu và Tích hợp AI cao cấp.";
+    if (text.includes("giá") || text.includes("chi phí")) return "Giá các dự án phụ thuộc vào quy mô và yêu cầu cụ thể. Hãy để lại thông tin trong **form liên hệ** bên dưới để nhận `báo giá chi tiết` nhé!";
+    if (text.includes("dịch vụ") || text.includes("làm gì")) return "Chúng tôi cung cấp các dịch vụ:\n- **Kiến trúc hình ảnh**\n- **Định vị thương hiệu**\n- **Tích hợp AI cao cấp**";
     if (text.includes("xin chào") || text.includes("hello")) return "Chào bạn! Rất vui được hỗ trợ bạn. Bạn quan tâm đến dịch vụ nào của chúng tôi?";
-    return "Cảm ơn bạn đã nhắn tin! Tôi đang trong giai đoạn thử nghiệm, nhưng tôi có thể ghi lại yêu cầu của bạn để chuyên viên tư vấn liên hệ lại.";
+    return "Cảm ơn bạn đã nhắn tin! Tôi đang trong giai đoạn thử nghiệm, nhưng tôi có thể ghi lại yêu cầu của bạn để chuyên viên tư vấn liên hệ lại.\n\n*Ghi chú: Tin nhắn của bạn đã được mã hóa.*";
   };
 
   return (
@@ -139,13 +141,15 @@ export default function Chatbot() {
                     {msg.sender === "bot" ? <Bot size={16} /> : <User size={16} />}
                   </div>
                   <div className={cn(
-                    "p-4 rounded-2xl text-sm leading-relaxed",
+                    "p-4 rounded-2xl text-sm leading-relaxed chat-markdown",
                     msg.sender === "bot"
                       ? "bg-surface-container border border-white/5 text-on-surface"
                       : "bg-primary-container text-on-primary-container font-medium"
-                  )}>
-                    {msg.text}
-                  </div>
+                  )}
+                    dangerouslySetInnerHTML={{ 
+                      __html: DOMPurify.sanitize(marked.parse(msg.text) as string) 
+                    }}
+                  />
                 </motion.div>
               ))}
               {isTyping && (
