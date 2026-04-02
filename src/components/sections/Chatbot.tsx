@@ -6,37 +6,52 @@ import { Bot, Send, User, X, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
-
-interface Message {
-  id: string;
-  text: string;
-  sender: "bot" | "user";
-  timestamp: Date;
-}
+import { Message } from "@/types";
+import { ChatService } from "@/lib/chatService";
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "1",
-      text: "Xin chào! Tôi là trợ lý AI của **NEON_NOCTURNE**. Tôi có thể giúp gì cho bạn?\n\n> Hãy thử hỏi về: **giá**, **dịch vụ** hoặc **làm dự án**.",
+      id: "welcome",
+      text: ChatService.getWelcomeMessage(),
       sender: "bot",
       timestamp: new Date(),
     },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Auto scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return;
+  // Handle Enter key press
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
+  // Send message to AI
+  const handleSend = async () => {
+    if (!inputValue.trim() || isTyping) return;
+
+    // Validate message
+    const validation = ChatService.validateMessage(inputValue);
+    if (!validation.isValid) {
+      setError(validation.error || "Tin nhắn không hợp lệ");
+      return;
+    }
+
+    setError(null);
+    
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputValue.trim(),
@@ -44,29 +59,42 @@ export default function Chatbot() {
       timestamp: new Date(),
     };
 
+    // Add user message immediately
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI Response
-    setTimeout(() => {
+    try {
+      // Get chat history (excluding welcome message for API)
+      const chatHistory = messages.filter(msg => msg.id !== "welcome");
+      const allMessages = [...chatHistory, userMessage];
+      
+      // Call AI API
+      const aiResponse = await ChatService.sendMessage(allMessages);
+      
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: getBotResponse(userMessage.text),
+        text: aiResponse,
         sender: "bot",
         timestamp: new Date(),
       };
+      
       setMessages((prev) => [...prev, botMessage]);
+      
+    } catch (error) {
+      console.error("Error getting AI response:", error);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        text: "❌ **Xin lỗi!** Tôi đang gặp sự cố kỹ thuật.\n\n🔄 Vui lòng thử lại sau hoặc liên hệ trực tiếp:\n📧 [a@example.com](mailto:a@example.com) | 💬 Zalo: 0123456789",
+        sender: "bot", 
+        timestamp: new Date(),
+      };
+      
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
-  };
-
-  const getBotResponse = (input: string) => {
-    const text = input.toLowerCase();
-    if (text.includes("giá") || text.includes("chi phí")) return "Giá các dự án phụ thuộc vào quy mô và yêu cầu cụ thể. Hãy để lại thông tin trong **form liên hệ** bên dưới để nhận `báo giá chi tiết` nhé!";
-    if (text.includes("dịch vụ") || text.includes("làm gì")) return "Chúng tôi cung cấp các dịch vụ:\n- **Kiến trúc hình ảnh**\n- **Định vị thương hiệu**\n- **Tích hợp AI cao cấp**";
-    if (text.includes("xin chào") || text.includes("hello")) return "Chào bạn! Rất vui được hỗ trợ bạn. Bạn quan tâm đến dịch vụ nào của chúng tôi?";
-    return "Cảm ơn bạn đã nhắn tin! Tôi đang trong giai đoạn thử nghiệm, nhưng tôi có thể ghi lại yêu cầu của bạn để chuyên viên tư vấn liên hệ lại.\n\n*Ghi chú: Tin nhắn của bạn đã được mã hóa.*";
+    }
   };
 
   return (
@@ -91,7 +119,7 @@ export default function Chatbot() {
             initial={{ opacity: 0, y: 100, scale: 0.8, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 100, scale: 0.8, filter: "blur(10px)" }}
-            className="fixed bottom-8 right-8 z-50 w-[380px] h-[520px] bg-surface-container-high/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden"
+            className="fixed bottom-8 right-8 z-50 w-95 h-130 bg-surface-container-high/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden overflow-x-hidden"
           >
             {/* Header */}
             <div className="p-6 bg-linear-to-r from-primary-container/20 to-transparent border-b border-white/5 flex justify-between items-center">
@@ -120,7 +148,7 @@ export default function Chatbot() {
             {/* Messages Area */}
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10"
+              className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10"
             >
               {messages.map((msg) => (
                 <motion.div
@@ -141,7 +169,7 @@ export default function Chatbot() {
                     {msg.sender === "bot" ? <Bot size={16} /> : <User size={16} />}
                   </div>
                   <div className={cn(
-                    "p-4 rounded-2xl text-sm leading-relaxed chat-markdown",
+                    "p-4 rounded-2xl text-sm leading-relaxed chat-markdown break-words overflow-wrap-anywhere whitespace-pre-wrap",
                     msg.sender === "bot"
                       ? "bg-surface-container border border-white/5 text-on-surface"
                       : "bg-primary-container text-on-primary-container font-medium"
@@ -168,6 +196,17 @@ export default function Chatbot() {
 
             {/* Input Area */}
             <div className="p-6 bg-surface-container-high border-t border-white/5">
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-3 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs"
+                >
+                  {error}
+                </motion.div>
+              )}
+              
               <form
                 onSubmit={(e) => { e.preventDefault(); handleSend(); }}
                 className="relative"
@@ -176,20 +215,35 @@ export default function Chatbot() {
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Nhập tin nhắn..."
-                  className="w-full bg-background border border-white/5 rounded-2xl py-4 pl-5 pr-14 text-sm text-on-surface placeholder:text-outline/30 focus:outline-none focus:border-primary-container/40 transition-all font-body"
+                  onKeyDown={handleKeyPress}
+                  placeholder="Nhập tin nhắn... (Enter để gửi)"
+                  disabled={isTyping}
+                  className="w-full bg-background border border-white/5 rounded-2xl py-4 pl-5 pr-14 text-sm text-on-surface placeholder:text-outline/30 focus:outline-none focus:border-primary-container/40 transition-all font-body disabled:opacity-50"
                 />
                 <button
                   type="submit"
-                  disabled={!inputValue.trim()}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-xl bg-primary-container text-on-primary-container disabled:opacity-30 enabled:cursor-pointer transition-all"
+                  disabled={!inputValue.trim() || isTyping}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-xl bg-primary-container text-on-primary-container disabled:opacity-30 enabled:cursor-pointer transition-all hover:bg-primary-container/80"
                 >
                   <Send size={18} />
                 </button>
               </form>
-              <p className="text-[9px] text-on-surface-variant/30 uppercase tracking-widest text-center mt-4 font-label">
-                Powered by NOCTURNE AI
-              </p>
+              
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-[9px] text-on-surface-variant/30 uppercase tracking-widest font-label">
+                  Powered by AI Expert Assistant
+                </p>
+                {isTyping && (
+                  <div className="flex items-center gap-2 text-[9px] text-primary-container/60 uppercase tracking-widest font-label">
+                    <div className="flex gap-1">
+                      <span className="w-1 h-1 rounded-full bg-primary-container/60 animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="w-1 h-1 rounded-full bg-primary-container/60 animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <span className="w-1 h-1 rounded-full bg-primary-container/60 animate-bounce" style={{ animationDelay: "300ms" }} />
+                    </div>
+                    Đang suy nghĩ...
+                  </div>
+                )}
+              </div>
             </div>
           </motion.div>
         )}
