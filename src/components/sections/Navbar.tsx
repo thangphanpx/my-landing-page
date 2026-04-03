@@ -53,9 +53,6 @@ export default function Navbar() {
     >
       <nav className="flex justify-between items-center px-8 max-w-7xl mx-auto">
         <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-primary-container text-2xl drop-shadow-[0_0_8px_rgba(0,210,255,0.5)]">
-            blur_on
-          </span>
           <span className="text-xl font-black tracking-widest text-primary-container drop-shadow-[0_0_8px_rgba(0,210,255,0.5)] font-headline">
             NEON_NOCTURNE
           </span>

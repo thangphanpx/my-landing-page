@@ -12,9 +12,6 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-12 relative z-10">
         <div className="flex flex-col items-center md:items-start gap-4">
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-primary-container text-xl drop-shadow-[0_0_8px_rgba(0,210,255,0.5)]">
-              blur_on
-            </span>
             <span className="text-xl font-black tracking-[0.3em] text-primary-container drop-shadow-[0_0_8px_rgba(0,210,255,0.5)] font-headline">
               NEON_NOCTURNE
             </span>
