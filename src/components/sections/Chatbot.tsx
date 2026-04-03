@@ -66,6 +66,13 @@ export default function Chatbot() {
     }
   }, [messages, isTyping]);
 
+  // Handle closing chat - reset session
+  const handleClose = () => {
+    setIsOpen(false);
+    // Reset session khi đóng chat để tạo session mới cho lần sau
+    ChatService.resetSession();
+  };
+
   // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -173,7 +180,7 @@ export default function Chatbot() {
               <motion.button
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
                 className="text-on-surface-variant/60 hover:text-on-surface transition-colors cursor-pointer"
               >
                 <X size={20} />
