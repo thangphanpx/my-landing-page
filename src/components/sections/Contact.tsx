@@ -8,18 +8,30 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const FORM_SUBMISSION_DELAY = 2000;
+  const SUCCESS_DISPLAY_DURATION = 5000;
+
+  const simulateFormSubmission = (): Promise<void> => {
+    return new Promise((resolve) => {
+      setTimeout(resolve, FORM_SUBMISSION_DELAY);
+    });
+  };
+
+  const resetFormAfterDelay = (): void => {
+    setTimeout(() => setIsSubmitted(false), SUCCESS_DISPLAY_DURATION);
+  };
+
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await simulateFormSubmission();
       setIsSubmitted(true);
-      
-      // Reset after 5 seconds
-      setTimeout(() => setIsSubmitted(false), 5000);
-    }, 2000);
+      resetFormAfterDelay();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

@@ -23,11 +23,46 @@ export default function Chatbot() {
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const latestMessageRef = useRef<HTMLDivElement>(null);
 
-  // Auto scroll to bottom when new messages arrive
+  const shouldAppendSpace = (currentInput: string): boolean => {
+    return !currentInput.endsWith(" ");
+  };
+
+  const isTextAlreadyPresent = (currentInput: string, newText: string): boolean => {
+    return currentInput.trim().endsWith(newText);
+  };
+
+  const insertSuggestion = (text: string): void => {
+    setInputValue((current) => {
+      const trimmedCurrent = current.trim();
+      
+      if (!trimmedCurrent) {
+        return text;
+      }
+
+      if (isTextAlreadyPresent(current, text)) {
+        return current;
+      }
+
+      const separator = shouldAppendSpace(current) ? " " : "";
+      return `${current}${separator}${text}`;
+    });
+  };
+
+  const suggestionList = [
+    "khóa học K89 - Agentic AI",
+    "MCP server & N8N AI",
+    "AI branding & automation",
+  ];
+
+  // Scroll to the top of the newest message when chat updates
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (latestMessageRef.current) {
+      latestMessageRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, [messages, isTyping]);
 
@@ -119,7 +154,7 @@ export default function Chatbot() {
             initial={{ opacity: 0, y: 100, scale: 0.8, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 100, scale: 0.8, filter: "blur(10px)" }}
-            className="fixed bottom-8 right-8 z-50 w-95 h-130 bg-surface-container-high/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden overflow-x-hidden"
+            className="fixed bottom-8 right-8 z-50 w-95 h-130 bg-surface-container-high/90 backdrop-blur-2xl border border-white/10 rounded-4xl shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden overflow-x-hidden"
           >
             {/* Header */}
             <div className="p-6 bg-linear-to-r from-primary-container/20 to-transparent border-b border-white/5 flex justify-between items-center">
@@ -148,13 +183,14 @@ export default function Chatbot() {
             {/* Messages Area */}
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10"
+              className="chatbot-scrollbar-hidden flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-4"
             >
-              {messages.map((msg) => (
+              {messages.map((msg, index) => (
                 <motion.div
                   initial={{ opacity: 0, x: msg.sender === "bot" ? -10 : 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   key={msg.id}
+                  ref={index === messages.length - 1 ? latestMessageRef : undefined}
                   className={cn(
                     "flex gap-3 max-w-[85%]",
                     msg.sender === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
@@ -168,20 +204,34 @@ export default function Chatbot() {
                   )}>
                     {msg.sender === "bot" ? <Bot size={16} /> : <User size={16} />}
                   </div>
-                  <div className={cn(
-                    "p-4 rounded-2xl text-sm leading-relaxed chat-markdown break-words overflow-wrap-anywhere whitespace-pre-wrap",
-                    msg.sender === "bot"
-                      ? "bg-surface-container border border-white/5 text-on-surface"
-                      : "bg-primary-container text-on-primary-container font-medium"
+                  {msg.sender === "bot" ? (
+                    <div className="p-4 rounded-2xl text-sm leading-relaxed chat-markdown wrap-break-word overflow-wrap-anywhere whitespace-pre-wrap bg-surface-container border border-white/5 text-on-surface">
+                      <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(msg.text) as string) }} />
+                      {msg.id === "welcome" && (
+                        <ul className="mt-3 space-y-2 list-disc pl-5">
+                          {suggestionList.map((item) => (
+                            <li key={item} className="text-on-surface">
+                              <button
+                                type="button"
+                                onClick={() => insertSuggestion(item)}
+                                className="text-primary-container font-semibold hover:underline cursor-pointer text-left"
+                              >
+                                {item}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-2xl text-sm leading-relaxed chat-markdown wrap-break-word overflow-wrap-anywhere whitespace-pre-wrap bg-primary-container text-on-primary-container font-medium">
+                      <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(msg.text) as string) }} />
+                    </div>
                   )}
-                    dangerouslySetInnerHTML={{ 
-                      __html: DOMPurify.sanitize(marked.parse(msg.text) as string) 
-                    }}
-                  />
                 </motion.div>
               ))}
               {isTyping && (
-                <div className="flex gap-3 max-w-[85%]">
+                <div className="flex gap-1 max-w-[89%]">
                   <div className="w-8 h-8 rounded-lg bg-primary-container/10 border border-primary-container/20 text-primary-container flex items-center justify-center">
                     <Bot size={16} />
                   </div>

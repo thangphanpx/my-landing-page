@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 :root {
   --background: #131313;
   --foreground: #bbc9cf;
@@ -77,6 +76,15 @@
   }
   .glow-indicator {
     box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+  }
+
+  .chatbot-scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .chatbot-scrollbar-hidden::-webkit-scrollbar {
+    display: none;
   }
 
   /* Chatboard Markdown Rendering Styles */

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenRouterClient, getOpenRouterModel } from '@/lib/openrouter';
-import { getSystemPrompt, FALLBACK_SYSTEM_PROMPT, validateSystemPrompt } from '@/lib/prompt_system';
+import { getValidatedSystemPrompt } from '@/lib/prompt_system';
 
 interface Message {
   role: 'system' | 'user' | 'assistant';
@@ -10,6 +10,23 @@ interface Message {
 interface ChatRequest {
   messages: Message[];
 }
+
+/**
+ * Extracts error message from error cause or falls back to main error message
+ */
+const extractErrorMessage = (errorCause: unknown, fallbackMessage: string): string => {
+  if (typeof errorCause === 'object' && errorCause !== null && 'message' in errorCause) {
+    return String((errorCause as { message?: unknown }).message);
+  }
+  return fallbackMessage;
+};
+
+/**
+ * Checks if error message indicates authentication/authorization issues
+ */
+const isAuthenticationError = (message: string): boolean => {
+  return message.includes('User not found') || message.includes('Unauthorized');
+};
 
 
 
@@ -30,38 +47,25 @@ export async function POST(request: NextRequest) {
 
     // Load system prompt từ prompt_system.ts
     console.log('🔄 Loading system prompt...');
-    let systemPrompt: string;
-    try {
-      systemPrompt = getSystemPrompt();
-      console.log('✅ System prompt loaded, length:', systemPrompt.length);
-      
-      // Validate system prompt
-      const validation = validateSystemPrompt(systemPrompt);
-      if (!validation.isValid) {
-        console.warn('⚠️ System prompt validation failed:', validation.error);
-        systemPrompt = FALLBACK_SYSTEM_PROMPT;
-      }
-    } catch (error) {
-      console.error('❌ Failed to load system prompt:', error);
-      systemPrompt = FALLBACK_SYSTEM_PROMPT;
-    }
+    const systemPrompt = getValidatedSystemPrompt();
+    console.log('✅ System prompt loaded, length:', systemPrompt.length);
     
     // Chuẩn bị messages cho API
     const apiMessages = [
       { role: 'system' as const, content: systemPrompt },
       ...messages.filter(msg => msg.role !== 'system')
     ];
-    console.log('📤 Sending to OpenRouter, messages count:', apiMessages.length);
+    console.log('📤 Sending to CES API, messages count:', apiMessages.length);
 
-    console.log('🌐 Calling OpenRouter API via OpenAI SDK...');
-    const openRouter = getOpenRouterClient();
-    const completion = await openRouter.chat.completions.create({
+    console.log('🌐 Calling CES API via OpenAI SDK...');
+    const cesClient = getOpenRouterClient();
+    const completion = await cesClient.chat.completions.create({
       model: getOpenRouterModel(),
       messages: apiMessages,
       temperature: 0.7,
       max_tokens: 1000,
     });
-    console.log('✅ OpenRouter response received');
+    console.log('✅ CES API response received');
 
     // Extract response
     const assistantMessage = completion.choices?.[0]?.message?.content || 
@@ -86,16 +90,13 @@ export async function POST(request: NextRequest) {
       stack: error instanceof Error ? error.stack : undefined,
     });
 
-    const upstreamMessage =
-      typeof errorCause === 'object' && errorCause !== null && 'message' in errorCause
-        ? String((errorCause as { message?: unknown }).message)
-        : errorMessage;
+    const upstreamMessage = extractErrorMessage(errorCause, errorMessage);
 
     return NextResponse.json(
       {
-        error: 'OpenRouter request failed',
-        message: upstreamMessage.includes('User not found')
-          ? 'OpenRouter từ chối API key hiện tại. Hãy tạo API key mới trên OpenRouter và cập nhật biến môi trường OPENROUTER_API_KEY.'
+        error: 'CES API request failed',
+        message: isAuthenticationError(upstreamMessage)
+          ? 'CES API key hoặc cấu hình không hợp lệ. Vui lòng kiểm tra lại cấu hình API trong openrouter.ts'
           : upstreamMessage,
       },
       { status: 500 }

@@ -1,39 +1,31 @@
-import { ChatCompletionRequestMessage, ChatCompletionResponse } from '@/types';
+import { ChatCompletionRequestMessage } from '@/types';
+import { getCESClient, getCESModel } from '@/lib/openrouter';
 
-const API_BASE = 'https://openrouter.ai/api/v1';
-const MODEL = 'z-ai/glm-4.5-air:free';
+/**
+ * 🤖 CES LLM Service
+ *
+ * Sử dụng OpenAI SDK chính thức với API endpoint tùy chỉnh của CES.
+ * Đảm bảo nhất quán với cấu hình trong openrouter.ts
+ */
 
 export async function callLLM(messages: ChatCompletionRequestMessage[]): Promise<string> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    throw new Error('OPENROUTER_API_KEY is not defined in environment variables');
-  }
-
   try {
-    const response = await fetch(`${API_BASE}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages,
-        // Optional: you can add temperature, max_tokens, etc.
-        temperature: 0.7,
-        max_tokens: 1000,
-      }),
+    console.log('🔄 Calling CES LLM API with OpenAI SDK...');
+    
+    const cesClient = getCESClient();
+    const completion = await cesClient.chat.completions.create({
+      model: getCESModel(),
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 1000,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
-    }
-
-    const data: ChatCompletionResponse = await response.json();
-    return data.choices[0]?.message?.content || 'No response from AI';
+    const response = completion.choices[0]?.message?.content || 'No response from AI';
+    console.log('✅ CES LLM API response received');
+    
+    return response;
   } catch (error) {
-    console.error('Error calling LLM API:', error);
-    throw error;
+    console.error('❌ Error calling CES LLM API:', error);
+    throw new Error(`CES API error: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

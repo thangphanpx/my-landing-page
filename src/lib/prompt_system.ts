@@ -33,7 +33,7 @@ export function loadChatbotData(): string {
     return fs.readFileSync(dataPath, 'utf-8');
   } catch (error) {
     console.error('Error loading chatbot data:', error);
-    return `* Tên chuyên gia: Nguyễn Văn A
+    return `* Tên chuyên gia: Phan Xuân Thăng
 * Định vị: Chuyên gia AI & Tự động hóa
 * Giải pháp: MCP server, N8N AI, đào tạo AI branding
 * Khóa học: K89 - Agentic AI (12 buổi, Online Zoom)
@@ -64,7 +64,7 @@ ${chatbotData}
    - Hướng dẫn liên hệ trực tiếp với chuyên gia qua email hoặc Zalo
 
 **KNOWLEDGE BASE CHI TIẾT:**
-- **Tên chuyên gia:** Nguyễn Văn A
+- **Tên chuyên gia:** Phan Xuân Thăng
 - **Chuyên môn:** AI & Tự động hóa
 - **Dịch vụ chính:** MCP server, N8N AI, đào tạo AI branding
 - **Khóa học hiện tại:** K89 - Agentic AI (12 buổi học online qua Zoom)
@@ -95,6 +95,28 @@ Hãy trả lời một cách chuyên nghiệp, thân thiện và hữu ích!`;
 export function getSystemPrompt(): string {
   const chatbotData = loadChatbotData();
   return createSystemPrompt(chatbotData);
+}
+
+/**
+ * Lấy system prompt đã được validate và fallback an toàn
+ * @returns Validated system prompt or fallback
+ */
+export function getValidatedSystemPrompt(): string {
+  try {
+    const systemPrompt = getSystemPrompt();
+    
+    // Validate system prompt
+    const validation = validateSystemPrompt(systemPrompt);
+    if (!validation.isValid) {
+      console.warn('⚠️ System prompt validation failed:', validation.error);
+      return FALLBACK_SYSTEM_PROMPT;
+    }
+    
+    return systemPrompt;
+  } catch (error) {
+    console.error('❌ Failed to load system prompt:', error);
+    return FALLBACK_SYSTEM_PROMPT;
+  }
 }
 
 /**

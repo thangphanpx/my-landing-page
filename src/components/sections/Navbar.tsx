@@ -22,17 +22,18 @@ export default function Navbar() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
       
-      // Basic scroll spy
+      // Basic scroll spy using functional approach
       const sections = ["hero", "about", "services", "portfolio", "contact"];
-      for (const section of sections) {
+      const activeSection = sections.find(section => {
         const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(section);
-            break;
-          }
-        }
+        if (!element) return false;
+        
+        const rect = element.getBoundingClientRect();
+        return rect.top <= 100 && rect.bottom >= 100;
+      });
+      
+      if (activeSection) {
+        setActiveSection(activeSection);
       }
     };
     window.addEventListener("scroll", handleScroll);
