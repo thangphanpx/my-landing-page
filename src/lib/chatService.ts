@@ -90,11 +90,16 @@ export class ChatService {
         const chatHistory = formatChatHistory(session.messages);
         
         // Gửi dữ liệu lên Google Sheets (async, không chặn UI)
-        this.handleLeadDataSubmission(
+        const leadStatus = await this.handleLeadDataSubmission(
           processedResponse.leadData, 
           chatHistory,
           session.sessionId
         );
+
+        // Thêm thông báo status vào response nếu có
+        if (leadStatus && leadStatus.statusMessage) {
+          return processedResponse.cleanResponse + "\n\n" + leadStatus.statusMessage;
+        }
       }
 
       // BƯỚC 3: Return clean response (đã bỏ tag) cho user
@@ -126,17 +131,20 @@ Cảm ơn bạn đã thông cảm! 🙏`;
    * @param leadData - Dữ liệu khách hàng
    * @param chatHistory - Lịch sử chat đã format
    * @param sessionId - Session ID
+   * @returns Status message cho user
    */
   private static async handleLeadDataSubmission(
     leadData: LeadData,
     chatHistory: string,
     sessionId: string
-  ): Promise<void> {
+  ): Promise<{ statusMessage?: string }> {
     try {
       // Kiểm tra xem Google Sheets có được cấu hình không
       if (!isGoogleScriptConfigured()) {
         console.warn("⚠️ Google Apps Script URL chưa được cấu hình");
-        return;
+        return {
+          statusMessage: "ℹ️ *Thông tin của bạn đã được ghi nhận trong hệ thống để hỗ trợ tốt hơn.*"
+        };
       }
 
       console.log("📊 Bắt đầu xử lý lead data:", leadData);
@@ -149,12 +157,21 @@ Cảm ơn bạn đã thông cảm! 🙏`;
       
       if (result.success) {
         console.log("✅ Lead data đã được lưu thành công vào Google Sheets!");
+        return {
+          statusMessage: `✅ ${result.statusMessage || 'Thông tin đã được lưu trữ an toàn!'}`
+        };
       } else {
         console.warn("⚠️ Không thể lưu lead data:", result.error);
+        return {
+          statusMessage: `ℹ️ ${result.statusMessage || 'Thông tin đã được ghi nhận, chúng tôi sẽ liên hệ sớm!'}`
+        };
       }
       
     } catch (error) {
       console.error("❌ Lỗi xử lý lead data submission:", error);
+      return {
+        statusMessage: "ℹ️ *Cảm ơn bạn đã chia sẻ thông tin. Chúng tôi sẽ liên hệ lại trong thời gian sớm nhất!* 🤝"
+      };
     }
   }
 

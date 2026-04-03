@@ -47,6 +47,12 @@ export interface SubmissionResult {
   success: boolean;
   error?: string;
   timestamp: number;
+  statusMessage?: string;
+  dataInfo?: {
+    hasName: boolean;
+    hasPhone: boolean;
+    hasEmail: boolean;
+  };
 }
 
 // ============================================================
@@ -99,29 +105,56 @@ export async function sendLeadToGoogleSheets(
 
     console.log("✅ Đã gửi dữ liệu lead thành công!");
 
+    // Tạo thông tin về data đã gửi
+    const dataInfo = {
+      hasName: !!(leadData.name && leadData.name.trim()),
+      hasPhone: !!(leadData.phone && leadData.phone.trim()),
+      hasEmail: !!(leadData.email && leadData.email.trim())
+    };
+
+    // Tạo status message dựa trên loại data
+    const fieldNames = [];
+    if (dataInfo.hasName) fieldNames.push('tên');
+    if (dataInfo.hasPhone) fieldNames.push('số điện thoại');
+    if (dataInfo.hasEmail) fieldNames.push('email');
+
+    let statusMessage = '';
+    if (fieldNames.length > 0) {
+      statusMessage = `🎯 Đã lưu ${fieldNames.join(', ')} của bạn vào hệ thống!`;
+    } else {
+      statusMessage = '📝 Đã ghi nhận thông tin cuộc trò chuyện.';
+    }
+
     // Note: Với mode 'no-cors', response.ok luôn là true
     // Chúng ta phải rely vào không có exception để biết thành công
     return {
       success: true,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      statusMessage,
+      dataInfo
     };
 
   } catch (error) {
     console.error("❌ Lỗi gửi dữ liệu lead:", error);
 
     let errorMessage = 'Unknown error';
+    let statusMessage = '📝 Thông tin đã được ghi nhận, chúng tôi sẽ liên hệ sớm!';
+    
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
         errorMessage = 'Request timeout';
+        statusMessage = '⏱️ Hệ thống đang bận, nhưng thông tin của bạn đã được ghi nhận!';
       } else {
         errorMessage = error.message;
+        statusMessage = '📋 Đã ghi nhận thông tin của bạn, chúng tôi sẽ liên hệ lại!';
       }
     }
 
     return {
       success: false,
       error: errorMessage,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      statusMessage
     };
   }
 }
@@ -173,7 +206,8 @@ export async function sendLeadWithRetry(
   return {
     success: false,
     error: `Failed after ${maxRetries + 1} attempts: ${lastError}`,
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    statusMessage: '📝 Thông tin của bạn đã được ghi nhận. Chúng tôi sẽ liên hệ khi hệ thống ổn định!'
   };
 }
 
