@@ -22,7 +22,7 @@ import { LeadData } from './leadDataExtractor';
  * TODO: Cập nhật URL thật sau khi deploy Google Apps Script
  */
 const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
-  'https://script.google.com/macros/s/AKfycbz0ljz3kAcpf2GVChqhW21oUd1hb78MAPJNws3KUwh0MZW-CHiJFX_6MlNkdspZw442/exec';
+  'https://script.google.com/macros/s/AKfycbwoZIxvqHB_vfEnQ4eluH8JVPin7gasSF60anhZHIJPijqaGdO2f9t92fO1nfcXTggZ/exec';
 
 /**
  * Timeout cho request (milliseconds)
@@ -220,7 +220,7 @@ export async function sendLeadWithRetry(
  * @returns true nếu URL đã được cấu hình
  */
 export function isGoogleScriptConfigured(): boolean {
-  return GOOGLE_SCRIPT_URL.length > 0;
+  return GOOGLE_SCRIPT_URL.length > 0 && GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/macros/s/');
 }
 
 /**

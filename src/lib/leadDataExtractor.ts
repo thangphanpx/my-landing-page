@@ -65,7 +65,7 @@ export function createChatSession(): ChatSession {
 /**
  * Regex pattern để phát hiện tag dữ liệu lead trong AI response
  */
-const LEAD_DATA_PATTERN = /\|\|LEAD_DATA:\s*(\{.*?\})\s*\|\|/;
+const LEAD_DATA_PATTERN = /\|\|LEAD_DATA:\s*(\{[\s\S]*?\})\s*\|\|/;
 
 /**
  * Parse và validate JSON data từ tag ||LEAD_DATA:..||
