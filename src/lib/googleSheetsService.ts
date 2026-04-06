@@ -5,7 +5,7 @@
 import { LeadData, OrderData } from './leadDataExtractor';
 
 const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
-  'https://script.google.com/macros/s/AKfycbwGFZI-hcWzyAX-xkQfLaaN14RbUqs9srIGN5AE-lE0cMu6FRip-2dKKwTTCTesUetV/exec';
+  'https://script.google.com/macros/s/AKfycbye0yco_7IwbEqrBHCmD9z3RkHek0V656XQRZGuE9SIOrD7Lgj-JkKzf7Mvw7YTmYzh/exec';
 
 const REQUEST_TIMEOUT = 10000;
 
@@ -28,12 +28,12 @@ export async function sendOrderToGoogleSheets(
 
     const payload = {
       type: 'order',
-      customerId: orderData.phone || 'GUEST',
-      productId: orderData.productId,
+      // customerId: orderData.phone || 'GUEST',
+      // productId: orderData.productId,
       quantity: orderData.quantity,
       name: orderData.name,
       phone: orderData.phone,
-      sessionId: sessionId,
+      // sessionId: sessionId,
     };
 
     const controller = new AbortController();

@@ -87,28 +87,10 @@ function sendOrderNotification(orderId, order, product, total, date) {
     .slice(1).map(r => r[2]).filter(e => e);
     
   if (emails.length === 0) return;
-  
-  const customers = getDataFromSheet('Customers');
-  const customer = customers.find(c => c.Customer_ID == order.Customer_ID);
-  const customerName = customer ? customer.Customer_Name : (order.Name || "Khách chưa định danh");
 
-  const subject = `🔔 [CES GLOBAL] - ĐƠN HÀNG MỚI: ${orderId}`;
-  const htmlBody = `
-    <div style="font-family: Arial, sans-serif; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-      <h2 style="color: #4361ee;">CES GLOBAL - ĐƠN HÀNG MỚI</h2>
-      <p>Chi tiết đơn hàng vừa được tạo:</p>
-      <table style="width: 100%;">
-        <tr><td><b>Mã đơn:</b></td><td>${orderId}</td></tr>
-        <tr><td><b>Khách hàng:</b></td><td>${customerName}</td></tr>
-        <tr><td><b>Sản phẩm:</b></td><td>${product ? product.Product_Name : 'N/A'}</td></tr>
-        <tr><td><b>Số lượng:</b></td><td>${order.Quantity}</td></tr>
-        <tr><td><b>Tổng tiền:</b></td><td style="color: #ef233c; font-weight: bold;">${total.toLocaleString('vi-VN')} VNĐ</td></tr>
-        <tr><td><b>Thời gian:</b></td><td>${Utilities.formatDate(date, "GMT+7", "dd/MM/yyyy HH:mm")}</td></tr>
-      </table>
-    </div>
-  `;
+  const subject = `🔔 [CES GLOBAL] - ĐƠN HÀNG MỚI: `;
   
-  MailApp.sendEmail({ to: emails.join(','), subject: subject, htmlBody: htmlBody });
+  MailApp.sendEmail({ to: emails.join(','), subject: subject, htmlBody: 'htmlBody' });
 }
 
 function getDataFromSheet(sheetName) {
