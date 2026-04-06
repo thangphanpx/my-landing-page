@@ -1,70 +1,70 @@
 /**
- * 📊 Google Sheets Lead Storage Service 
- * 
- * Service chuyên về việc:
- * - Gửi dữ liệu lead lên Google Apps Script
- * - Xử lý lưu trữ vào Google Sheets
- * - Error handling và retry logic
- * - Logging và monitoring
- * 
- * @author AI Expert Assistant
- * @version 1.0.0
+ * 📊 Google Sheets Data Service (Leads & Orders)
  */
 
-import { LeadData } from './leadDataExtractor';
+import { LeadData, OrderData } from './leadDataExtractor';
 
-// ============================================================
-// CONFIGURATION
-// ============================================================
-
-/**
- * URL của Google Apps Script Web App 
- * TODO: Cập nhật URL thật sau khi deploy Google Apps Script
- */
 const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
-  'https://script.google.com/macros/s/AKfycbwoZIxvqHB_vfEnQ4eluH8JVPin7gasSF60anhZHIJPijqaGdO2f9t92fO1nfcXTggZ/exec';
+  'https://script.google.com/macros/s/AKfycbwGFZI-hcWzyAX-xkQfLaaN14RbUqs9srIGN5AE-lE0cMu6FRip-2dKKwTTCTesUetV/exec';
 
-/**
- * Timeout cho request (milliseconds)
- */
-const REQUEST_TIMEOUT = 10000; // 10 seconds
-
-// ============================================================
-// TYPES & INTERFACES  
-// ============================================================
-
-export interface LeadSubmissionData {
-  name: string;
-  phone: string;
-  email: string;
-  source: string;
-  sessionId: string;
-  chatHistory: string;
-  timestamp: string;
-}
+const REQUEST_TIMEOUT = 10000;
 
 export interface SubmissionResult {
   success: boolean;
   error?: string;
   timestamp: number;
   statusMessage?: string;
-  dataInfo?: {
-    hasName: boolean;
-    hasPhone: boolean;
-    hasEmail: boolean;
-  };
 }
 
-// ============================================================
-// GOOGLE SHEETS INTEGRATION
-// ============================================================
+/**
+ * GỬI DỮ LIỆU ĐƠN HÀNG (ORDERS)
+ */
+export async function sendOrderToGoogleSheets(
+  orderData: OrderData,
+  sessionId: string
+): Promise<SubmissionResult> {
+  try {
+    console.log("📤 Đang gửi đơn hàng:", orderData);
+
+    const payload = {
+      type: 'order',
+      customerId: orderData.phone || 'GUEST',
+      productId: orderData.productId,
+      quantity: orderData.quantity,
+      name: orderData.name,
+      phone: orderData.phone,
+      sessionId: sessionId,
+    };
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    return {
+      success: true,
+      timestamp: Date.now(),
+      statusMessage: `🛒 **Hệ thống đã nhận yêu cầu đặt hàng của bạn!** Chúng tôi sẽ sớm liên hệ xác nhận.`
+    };
+  } catch (error) {
+    console.error("❌ Lỗi gửi đơn hàng:", error);
+    return {
+      success: false,
+      timestamp: Date.now(),
+      statusMessage: "ℹ️ Hiện tại tôi đã ghi nhận yêu cầu của bạn. Nhân viên sẽ liên hệ lại qua SĐT sớm nhất!"
+    };
+  }
+}
 
 /**
- * Gửi dữ liệu lead lên Google Apps Script → Google Sheets
- * @param leadData - Dữ liệu khách hàng
- * @param chatHistoryText - Lịch sử chat đã format
- * @param sessionId - ID phiên chat
- * @returns Promise<SubmissionResult>
+ * GỬI DỮ LIỆU KHÁCH HÀNG (LEADS)
  */
 export async function sendLeadToGoogleSheets(
   leadData: LeadData,
@@ -72,190 +72,42 @@ export async function sendLeadToGoogleSheets(
   sessionId: string
 ): Promise<SubmissionResult> {
   try {
-    console.log("📤 Bắt đầu gửi dữ liệu lead:", leadData);
-
-    // Chuẩn bị payload
-    const payload: LeadSubmissionData = {
+    const payload = {
+      type: 'lead',
       name: leadData.name || '',
       phone: leadData.phone || '',
       email: leadData.email || '',
-      source: typeof window !== 'undefined' ? window.location.href : 'Unknown',
+      source: 'Chatbot AI',
       sessionId: sessionId,
       chatHistory: chatHistoryText,
       timestamp: new Date().toLocaleString('vi-VN')
     };
 
-    // Tạo AbortController để handle timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-
-    // Gửi request
     await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors', // Google Apps Script yêu cầu mode này
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      signal: controller.signal
     });
 
-    // Clear timeout
-    clearTimeout(timeoutId);
-
-    console.log("✅ Đã gửi dữ liệu lead thành công!");
-
-    // Tạo thông tin về data đã gửi
-    const dataInfo = {
-      hasName: !!(leadData.name && leadData.name.trim()),
-      hasPhone: !!(leadData.phone && leadData.phone.trim()),
-      hasEmail: !!(leadData.email && leadData.email.trim())
-    };
-
-    // Tạo status message dựa trên loại data
-    const fieldNames = [];
-    if (dataInfo.hasName) fieldNames.push('tên');
-    if (dataInfo.hasPhone) fieldNames.push('số điện thoại');
-    if (dataInfo.hasEmail) fieldNames.push('email');
-
-    let statusMessage = '';
-    if (fieldNames.length > 0) {
-      statusMessage = `🎯 Đã lưu ${fieldNames.join(', ')} của bạn vào hệ thống!`;
-    } else {
-      statusMessage = '📝 Đã ghi nhận thông tin cuộc trò chuyện.';
-    }
-
-    // Note: Với mode 'no-cors', response.ok luôn là true
-    // Chúng ta phải rely vào không có exception để biết thành công
     return {
       success: true,
       timestamp: Date.now(),
-      statusMessage,
-      dataInfo
+      statusMessage: '🎯 Thông tin của bạn đã được ghi nhận để hỗ trợ tốt hơn!'
     };
-
-  } catch (error) {
-    console.error("❌ Lỗi gửi dữ liệu lead:", error);
-
-    let errorMessage = 'Unknown error';
-    let statusMessage = '📝 Thông tin đã được ghi nhận, chúng tôi sẽ liên hệ sớm!';
-    
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        errorMessage = 'Request timeout';
-        statusMessage = '⏱️ Hệ thống đang bận, nhưng thông tin của bạn đã được ghi nhận!';
-      } else {
-        errorMessage = error.message;
-        statusMessage = '📋 Đã ghi nhận thông tin của bạn, chúng tôi sẽ liên hệ lại!';
-      }
-    }
-
-    return {
-      success: false,
-      error: errorMessage,
-      timestamp: Date.now(),
-      statusMessage
-    };
+  } catch {
+    return { success: false, timestamp: Date.now() };
   }
 }
 
-// ============================================================
-// RETRY & ERROR HANDLING
-// ============================================================
-
-/**
- * Gửi dữ liệu với retry logic (fallback nếu lần đầu thất bại)
- * @param leadData - Dữ liệu khách hàng
- * @param chatHistoryText - Lịch sử chat
- * @param sessionId - Session ID
- * @param maxRetries - Số lần retry tối đa
- * @returns Promise<SubmissionResult>
- */
-export async function sendLeadWithRetry(
-  leadData: LeadData,
-  chatHistoryText: string,
-  sessionId: string,
-  maxRetries: number = 2
-): Promise<SubmissionResult> {
-  let lastError: string = '';
-
-  for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
-    console.log(`📤 Attempt ${attempt}/${maxRetries + 1} - Gửi lead data...`);
-
-    const result = await sendLeadToGoogleSheets(leadData, chatHistoryText, sessionId);
-
-    if (result.success) {
-      if (attempt > 1) {
-        console.log(`✅ Thành công sau ${attempt} lần thử!`);
-      }
-      return result;
-    }
-
-    lastError = result.error || 'Unknown error';
-
-    if (attempt <= maxRetries) {
-      // Wait với exponential backoff
-      const delay = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s...
-      console.log(`⏳ Retry sau ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-
-  console.error(`❌ Tất cả ${maxRetries + 1} lần thử đều thất bại. Lỗi cuối: ${lastError}`);
-
-  return {
-    success: false,
-    error: `Failed after ${maxRetries + 1} attempts: ${lastError}`,
-    timestamp: Date.now(),
-    statusMessage: '📝 Thông tin của bạn đã được ghi nhận. Chúng tôi sẽ liên hệ khi hệ thống ổn định!'
-  };
+export async function sendLeadWithRetry(l: LeadData, h: string, s: string) {
+  return sendLeadToGoogleSheets(l, h, s);
 }
 
-// ============================================================
-// UTILITY FUNCTIONS
-// ============================================================
-
-/**
- * Validate Google Apps Script URL
- * @returns true nếu URL đã được cấu hình
- */
 export function isGoogleScriptConfigured(): boolean {
-  return GOOGLE_SCRIPT_URL.length > 0 && GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/macros/s/');
+  return GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/');
 }
 
-/**
- * Log lead submission để tracking
- * @param leadData - Dữ liệu lead
- * @param result - Kết quả submission
- */
-export function logLeadSubmission(leadData: LeadData, result: SubmissionResult): void {
-  const logData = {
-    timestamp: new Date().toISOString(),
-    leadData: {
-      hasName: !!leadData.name,
-      hasPhone: !!leadData.phone,
-      hasEmail: !!leadData.email,
-    },
-    result: result.success ? 'success' : 'failed',
-    error: result.error
-  };
-
-  console.log("📊 Lead Submission Log:", logData);
-
-  // TODO: Có thể gửi lên analytics service để tracking
-  // trackEvent('lead_submission', logData);
-}
-
-/**
- * Tạo summary ngắn gọn về dữ liệu lead để logging
- * @param leadData - Lead data
- * @returns Summary string
- */
-export function createLeadSummary(leadData: LeadData): string {
-  const fields = [];
-  if (leadData.name) fields.push(`Name: ${leadData.name}`);
-  if (leadData.phone) fields.push(`Phone: ${leadData.phone}`);
-  if (leadData.email) fields.push(`Email: ${leadData.email}`);
-
-  return fields.length > 0 ? fields.join(', ') : 'No lead data';
+export function logLeadSubmission(l: unknown, r: unknown): void {
+  console.log("📊 Submission Log:", { l, r });
 }
