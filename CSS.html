@@ -1,0 +1,67 @@
+<style>
+  :root {
+    --primary: #4361ee;
+    --secondary: #4cc9f0;
+    --success: #2ec4b6;
+    --danger: #ef233c;
+    --dark: #1a1b26;
+    --light: #f8f9fa;
+  }
+  
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--light);
+    color: #333;
+    padding-bottom: 50px;
+  }
+  
+  .navbar {
+    background-color: var(--dark);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .nav-tabs {
+    border-bottom: none;
+    background: #e9ecef;
+    border-radius: 50px;
+    padding: 5px;
+    display: inline-flex;
+    margin: 20px auto 40px;
+  }
+  
+  .nav-link {
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 12px 30px !important;
+    color: #666;
+    font-weight: 600;
+  }
+  
+  .nav-link.active {
+    background-color: var(--primary) !important;
+    color: white !important;
+    box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+  }
+  
+  .card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    overflow: hidden;
+  }
+  
+  .table thead {
+    background-color: #f1f3f5;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .btn-primary { background: var(--primary); border: none; padding: 10px 24px; border-radius: 10px; }
+  .btn-dark { border-radius: 10px; padding: 10px 24px; }
+  
+  .tab-pane { animation: fadeIn 0.4s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>

@@ -1,0 +1,94 @@
+<script>
+  let customers = [];
+  let products = [];
+  let orders = [];
+
+  document.addEventListener('DOMContentLoaded', function() {
+    refreshData();
+    
+    // Xử lý tạo đơn hàng
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const statusDiv = document.getElementById('orderStatus');
+      statusDiv.classList.remove('d-none');
+      statusDiv.innerText = '🚀 Đang xử lý đơn hàng và gửi email thông báo...';
+      
+      const order = {
+        Customer_ID: document.getElementById('order_customer').value,
+        Product_ID: document.getElementById('order_product').value,
+        Quantity: parseInt(document.getElementById('order_quantity').value)
+      };
+      
+      google.script.run
+        .withSuccessHandler(function(res) {
+          statusDiv.innerText = '✅ Đơn hàng ' + res.orderId + ' đã được tạo thành công! Tổng tiền: ' + res.total.toLocaleString() + ' VNĐ. Email thông báo đã gửi!';
+          statusDiv.className = 'alert alert-success mt-3';
+          document.getElementById('orderForm').reset();
+          refreshData();
+        })
+        .createNewOrder(order);
+    });
+  });
+
+  function refreshData() {
+    // Tải khách hàng
+    google.script.run.withSuccessHandler(function(data) {
+      customers = data;
+      renderCustomersSelect();
+    }).getDataFromSheet('Customers');
+
+    // Tải sản phẩm
+    google.script.run.withSuccessHandler(function(data) {
+      products = data;
+      renderProductsSelect();
+    }).getDataFromSheet('Products');
+
+    // Tải đơn hàng
+    google.script.run.withSuccessHandler(function(data) {
+      orders = data;
+      renderOrdersTable();
+    }).getDataFromSheet('Orders');
+  }
+
+  function renderCustomersSelect() {
+    const select = document.getElementById('order_customer');
+    select.innerHTML = '<option value="">-- Chọn khách hàng --</option>' + 
+      customers.map(c => `<option value="${c.Customer_ID}">${c.Customer_Name}</option>`).join('');
+  }
+
+  function renderProductsSelect() {
+    const select = document.getElementById('order_product');
+    select.innerHTML = '<option value="">-- Chọn sản phẩm --</option>' + 
+      products.map(p => `<option value="${p.Product_ID}">${p.Product_Name} (${p.Price.toLocaleString()} VNĐ)</option>`).join('');
+  }
+
+  function renderOrdersTable() {
+    const tbody = document.getElementById('ordersList');
+    tbody.innerHTML = orders.map(o => `
+      <tr>
+        <td><small class='fw-bold'>${o.Order_ID}</small></td>
+        <td>${getCustomerName(o.Customer_ID)}</td>
+        <td>${getProductName(o.Product_ID)}</td>
+        <td class='text-center'>${o.Quantity}</td>
+        <td class='text-end fw-bold text-primary'>${(o.Total_Amount || 0).toLocaleString()}</td>
+        <td><small class='text-muted'>${formatDate(o.Created_At)}</small></td>
+      </tr>
+    `).join('');
+  }
+  
+  function getCustomerName(id) { 
+    const c = customers.find(x => x.Customer_ID == id); 
+    return c ? c.Customer_Name : id; 
+  }
+  
+  function getProductName(id) { 
+    const p = products.find(x => x.Product_ID == id); 
+    return p ? p.Product_Name : id; 
+  }
+
+  function formatDate(d) {
+    if (!d) return '';
+    const date = new Date(d);
+    return date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+  }
+</script>
