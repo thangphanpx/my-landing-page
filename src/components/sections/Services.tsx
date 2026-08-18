@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Layout, Palette, Sparkles, Monitor, Cpu, Workflow } from "lucide-react";
+import { Palette, Sparkles, Monitor, Workflow } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const services = [
@@ -27,16 +27,16 @@ const services = [
 
 export default function Services() {
   return (
-    <section className="py-32 bg-surface relative" id="services">
+    <section className="py-24 bg-surface relative" id="services">
       <div className="max-w-7xl mx-auto px-8">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-col mb-24 md:flex-row md:justify-between md:items-end gap-6"
+          className="flex flex-col mb-16 md:flex-row md:justify-between md:items-end gap-6"
         >
           <div className="max-w-2xl">
-            <h2 className="font-label text-secondary text-sm tracking-[0.4em] uppercase mb-4">Năng lực</h2>
+            <h2 className="font-label text-secondary text-sm tracking-[0.3em] uppercase mb-4">Năng lực</h2>
             <h3 className="font-headline text-5xl md:text-6xl text-on-surface font-bold tracking-tight leading-tight">
               Giải pháp cho <br /><span className="text-secondary drop-shadow-[0_0_15px_rgba(237,177,255,0.4)]">Tương lai</span>
             </h3>
@@ -46,35 +46,35 @@ export default function Services() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-0 border border-white/5 rounded-[40px] overflow-hidden bg-surface-container-low shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)]">
+        <div className="grid md:grid-cols-3 gap-0 border border-white/5 rounded-xl overflow-hidden bg-surface-container-low shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)]">
           {services.map((service, index) => (
-            <motion.div 
+            <motion.div
               key={index}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: index * 0.1 }}
               className={cn(
-                "p-16 bg-surface-container-low border-b md:border-b-0 group hover:bg-surface-container-highest transition-all duration-700 relative flex flex-col justify-between min-h-[480px]",
+                "p-12 bg-surface-container border-b md:border-b-0 group hover:bg-surface-container-high transition-all duration-500 relative flex flex-col justify-between min-h-[480px]",
                 index !== services.length - 1 && "md:border-r border-white/5"
               )}
             >
               <div className="z-10 relative h-full flex flex-col justify-between">
                 <div>
                   <div className={cn(
-                    "w-16 h-[2px] bg-transparent group-hover:w-full transition-all duration-700 mb-12",
+                    "w-0 h-1 group-hover:w-full transition-all duration-500 mb-8",
                     service.color === "primary-container" ? "bg-primary-container glow-indicator" : "bg-secondary shadow-[0_0_15px_rgba(237,177,255,0.5)]"
                   )} />
                   <div className="mb-10 p-5 rounded-3xl bg-background w-fit group-hover:scale-110 transition-transform duration-500 shadow-xl border border-white/3">
                     <service.icon className={cn(
                       "transition-all duration-500 group-hover:drop-shadow-[0_0_12px_currentColor]",
                       service.color === "primary-container" ? "text-primary-container" : "text-secondary"
-                    )} size={48} strokeWidth={1} />
+                    )} size={36} strokeWidth={1} />
                   </div>
-                  <h4 className="font-headline text-3xl text-on-surface mb-6 leading-tight group-hover:text-white transition-colors">
+                  <h4 className="font-headline text-2xl text-on-surface mb-4 leading-tight group-hover:text-white transition-colors">
                     {service.title}
                   </h4>
-                  <p className="text-on-surface-variant text-lg leading-relaxed group-hover:text-on-surface transition-colors">
+                  <p className="text-on-surface-variant leading-relaxed group-hover:text-on-surface transition-colors">
                     {service.description}
                   </p>
                 </div>

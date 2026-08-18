@@ -38,7 +38,7 @@ const projects = [
 
 export default function Portfolio() {
   return (
-    <section className="py-32 bg-background relative" id="portfolio">
+    <section className="py-24 bg-surface-container-low relative" id="portfolio">
       {/* Background radial glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-primary-container/5 blur-[150px] rounded-full pointer-events-none" />
 
@@ -47,7 +47,7 @@ export default function Portfolio() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-24 text-center"
+          className="mb-16 text-center"
         >
           <h2 className="font-label text-primary-container text-sm tracking-[0.4em] uppercase mb-4">Lưu trữ</h2>
           <h3 className="font-headline text-5xl md:text-7xl text-on-surface font-black tracking-tighter">
@@ -67,7 +67,7 @@ export default function Portfolio() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: index * 0.1 }}
               className={cn(
-                "relative group rounded-[40px] overflow-hidden bg-surface-container-low border border-white/5 transition-shadow duration-500 hover:shadow-[0_20px_50px_-20px_rgba(0,210,255,0.3)] shadow-2xl",
+                "relative group rounded-xl overflow-hidden bg-surface-container-low border border-white/5 transition-shadow duration-500 hover:shadow-[0_20px_50px_-20px_rgba(0,210,255,0.3)] shadow-2xl",
                 project.size === "large" ? "lg:col-span-2 aspect-video" : "aspect-4/5"
               )}
             >
@@ -112,7 +112,7 @@ export default function Portfolio() {
 
               {/* dynamic rim light effect on hover */}
               <div className={cn(
-                "absolute inset-0 border-[3px] border-transparent rounded-[40px] transition-colors duration-700 group-hover:border-white/10 pointer-events-none",
+                "absolute inset-0 border-[3px] border-transparent rounded-xl transition-colors duration-700 group-hover:border-white/10 pointer-events-none",
                 project.color === "primary" ? "group-hover:shadow-[inset_0_0_20px_rgba(0,210,255,0.2)]" : "group-hover:shadow-[inset_0_0_20px_rgba(237,177,255,0.2)]"
               )} />
             </motion.div>

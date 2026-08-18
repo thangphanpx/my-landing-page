@@ -6,7 +6,7 @@ import { ArrowRight, MessageSquare } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="min-h-screen flex items-center pt-32 px-8 relative overflow-hidden bg-linear-to-br from-background via-surface to-surface-container-low" id="hero">
+    <section className="min-h-screen flex items-center pt-20 px-8 relative overflow-hidden bg-linear-to-br from-background via-surface to-surface-container-low" id="hero">
       {/* Signature Texture Ambient Glow */}
       <motion.div 
         initial={{ opacity: 0, scale: 0.5 }}
@@ -18,7 +18,7 @@ export default function Hero() {
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
-        className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-secondary/10 blur-[100px] rounded-full pointer-events-none"
+        className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-secondary-container/10 blur-[100px] rounded-full pointer-events-none"
       />
 
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center w-full z-10">
@@ -29,12 +29,12 @@ export default function Hero() {
           className="space-y-10"
         >
           <div className="inline-block px-4 py-1 rounded-full bg-primary-container/10 border border-primary-container/20">
-            <span className="font-label text-primary text-[10px] uppercase tracking-[0.3em]">
+            <span className="font-label text-primary text-xs uppercase tracking-[0.2em]">
               Sẵn sàng cho dự án mới
             </span>
           </div>
-          
-          <h1 className="font-headline font-extrabold text-7xl lg:text-[100px] text-on-surface leading-[1.1] tracking-tighter">
+
+          <h1 className="font-headline font-extrabold text-7xl lg:text-8xl text-on-surface leading-tight tracking-tighter">
             Kiến tạo <br />
             <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-container to-primary drop-shadow-[0_0_25px_rgba(0,210,255,0.4)]">
               Trải nghiệm
@@ -50,14 +50,14 @@ export default function Hero() {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-linear-to-r from-primary-container to-primary text-on-primary-container font-headline font-bold py-5 px-10 rounded-2xl flex items-center gap-3 transition-shadow hover:shadow-[0_0_30px_rgba(0,210,255,0.4)]"
+              className="bg-linear-to-r from-primary-container to-primary text-on-primary-container font-headline font-bold py-4 px-10 rounded-xl flex items-center gap-3 transition-shadow hover:shadow-[0_0_30px_rgba(0,210,255,0.4)]"
             >
               Xem Sản phẩm <ArrowRight size={20} />
             </motion.button>
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-surface-variant/20 backdrop-blur-md border border-white/10 text-on-surface font-headline font-bold py-5 px-10 rounded-2xl flex items-center gap-3 hover:bg-surface-variant/40 transition-all"
+              className="bg-surface-variant/20 backdrop-blur-md border border-white/10 text-on-surface font-headline font-bold py-4 px-10 rounded-xl flex items-center gap-3 hover:bg-surface-variant/40 transition-all"
             >
               Trao đổi ngay <MessageSquare size={20} />
             </motion.button>
@@ -70,7 +70,7 @@ export default function Hero() {
           transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
           className="relative flex justify-center items-center"
         >
-          <div className="relative w-[320px] h-[320px] lg:w-[500px] lg:h-[500px] rounded-full p-2 bg-linear-to-tr from-primary-container via-transparent to-secondary-container shadow-[0_0_80px_rgba(0,210,255,0.2)]">
+          <div className="relative w-[320px] h-[320px] lg:w-[450px] lg:h-[450px] rounded-full p-2 bg-linear-to-tr from-primary-container via-transparent to-secondary-container shadow-[0_0_80px_rgba(0,210,255,0.2)]">
             <div className="w-full h-full rounded-full overflow-hidden bg-surface-container relative">
               <Image 
                 alt="Avatar" 
@@ -84,15 +84,15 @@ export default function Hero() {
           </div>
           
           {/* Decorative Elements */}
-          <motion.div 
+          <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-6 -right-6 w-32 h-32 border-t-2 border-r-2 border-primary-container/40 rounded-tr-[40px] pointer-events-none"
+            className="absolute -top-4 -right-4 w-24 h-24 border-t-4 border-r-4 border-primary-container/40 rounded-tr-3xl pointer-events-none"
           />
-          <motion.div 
+          <motion.div
             animate={{ rotate: -360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -bottom-6 -left-6 w-32 h-32 border-b-2 border-l-2 border-secondary/40 rounded-bl-[40px] pointer-events-none"
+            className="absolute -bottom-4 -left-4 w-24 h-24 border-b-4 border-l-4 border-secondary-container/40 rounded-bl-3xl pointer-events-none"
           />
         </motion.div>
       </div>

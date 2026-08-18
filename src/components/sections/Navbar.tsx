@@ -14,14 +14,11 @@ const navItems = [
 ];
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-      
       // Basic scroll spy using functional approach
       const sections = ["hero", "about", "services", "portfolio", "contact"];
       const activeSection = sections.find(section => {
@@ -44,12 +41,7 @@ export default function Navbar() {
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-300 border-b",
-        isScrolled 
-          ? "bg-background/80 backdrop-blur-xl border-white/5 py-3 shadow-[0_4px_30px_rgba(0,0,0,0.1)]" 
-          : "bg-transparent border-transparent py-5"
-      )}
+      className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 py-4 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
     >
       <nav className="flex justify-between items-center px-8 max-w-7xl mx-auto">
         <div className="flex items-center gap-3">
@@ -59,7 +51,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8 font-label uppercase tracking-widest text-[11px]">
+        <div className="hidden md:flex items-center gap-10 font-label uppercase tracking-widest text-[10px]">
           {navItems.map((item) => (
             <a
               key={item.href}
