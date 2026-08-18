@@ -6,44 +6,46 @@ Dự án này đã được cấu hình để sử dụng API LLM tùy chỉnh c
 
 ### 📋 Thông số cấu hình
 
-| Thông số | Giá trị |
+Các thông số được đọc từ biến môi trường trong file `.env` (xem template ở `.env.example`), **không** hard-code trong source code:
+
+| Biến môi trường | Ý nghĩa |
 |----------|---------|
-| **Base URL** | `` |
-| **Endpoint** | `` |
-| **Model** | `` |
-| **API Key** | `` |
+| `CES_API_BASE_URL` | Base URL của API CES (OpenAI-compatible) |
+| `CES_API_KEY` | API key để xác thực với CES |
+| `CES_MODEL` | Tên model sử dụng cho mọi request |
 
 ### 🔧 Files đã được cấu hình
 
-1. **`src/lib/openrouter.ts`** - Cấu hình chính CES client với OpenAI SDK
+1. **`src/lib/openrouter.ts`** - Cấu hình chính CES client với OpenAI SDK, đọc 3 biến trên từ `process.env`
 2. **`src/lib/llmService.ts`** - Service sử dụng CES client
 3. **`src/app/api/chatbot/route.ts`** - API route handler cho chatbot
 
 ### 🎯 Cách hoạt động
 
 - Sử dụng **OpenAI SDK chính thức** với `baseURL` override
-- API key được hard-code như yêu cầu  
-- Model `ces-chatbot-gpt-5.4` được sử dụng cho tất cả requests
+- API key được đọc từ biến môi trường (`.env`), nếu thiếu sẽ throw lỗi ngay khi khởi tạo client
 - Tuân thủ 100% chuẩn OpenAI API format
 
 ### 🚀 Testing
 
-Để test API, chạy development server:
-
-```bash
-npm run dev
-```
-
-Sau đó truy cập chatbot trên trang web để test.
+1. Tạo file `.env` từ template và điền giá trị thật:
+   ```bash
+   cp .env.example .env
+   ```
+2. Chạy development server:
+   ```bash
+   npm run dev
+   ```
+3. Truy cập chatbot trên trang web để test.
 
 ### 🔄 Thay đổi cấu hình
 
-Nếu cần thay đổi API key, base URL hoặc model, chỉ cần cập nhật constants trong file `src/lib/openrouter.ts`:
+Nếu cần thay đổi API key, base URL hoặc model, chỉ cần cập nhật giá trị tương ứng trong file `.env` — **không** sửa trực tiếp trong `src/lib/openrouter.ts`:
 
-```typescript
-const CES_API_BASE_URL = 'https://9router.vuhai.io.vn/v1';
-const CES_API_KEY = 'sk-4bd27113b7dc78d1-lh6jld-f4f9c69f';
-const CES_MODEL = 'ces-chatbot-gpt-5.4';
+```bash
+CES_API_BASE_URL=https://your-api-host/v1
+CES_API_KEY=sk-your-real-key
+CES_MODEL=your-model-name
 ```
 
 ---

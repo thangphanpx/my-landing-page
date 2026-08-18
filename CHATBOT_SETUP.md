@@ -12,12 +12,13 @@ Hệ thống chatbot AI chuyên nghiệp được tích hợp với OpenRouter A
 
 ### 2. Cấu Hình Environment Variables
 ```bash
-# Tạo file .env.local từ template
-cp .env.example .env.local
+# Tạo file .env từ template
+cp .env.example .env
 
-# Chỉnh sửa .env.local và thêm:
-OPENROUTER_API_KEY=your_actual_api_key_here
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+# Chỉnh sửa .env và thêm:
+CES_API_BASE_URL=your_api_base_url_here
+CES_API_KEY=your_actual_api_key_here
+CES_MODEL=your_model_name_here
 ```
 
 ### 3. Cài Đặt Dependencies (nếu cần)
@@ -160,7 +161,7 @@ npm start
 ### Lỗi API Key:
 ```
 Error: API request failed
-→ Kiểm tra OPENROUTER_API_KEY trong .env.local
+→ Kiểm tra CES_API_KEY, CES_API_BASE_URL, CES_MODEL trong .env
 ```
 
 ### Lỗi Network:
@@ -195,4 +196,4 @@ Error: Failed to fetch
 
 **🎉 Hệ thống sẵn sàng production!** 
 
-Chỉ cần thêm OPENROUTER_API_KEY và deploy!
+Chỉ cần thêm CES_API_KEY, CES_API_BASE_URL, CES_MODEL vào `.env` và deploy!
