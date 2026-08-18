@@ -5,7 +5,7 @@ import Services from "@/components/sections/Services";
 import Portfolio from "@/components/sections/Portfolio";
 import Contact from "@/components/sections/Contact";
 import Footer from "@/components/sections/Footer";
-import Chatbot from "@/components/sections/Chatbot";
+// import Chatbot from "@/components/sections/Chatbot";
 
 export default function Home() {
   return (
@@ -19,7 +19,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
-      <Chatbot />
+      {/* <Chatbot /> */}
     </div>
   );
 }
